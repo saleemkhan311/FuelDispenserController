@@ -1,0 +1,42 @@
+﻿<Page
+    x:Class="FuelDispenserController.Views.DataGridPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" xmlns:viewmodels="using:FuelDispenserController.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:DataGridViewModel}"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    mc:Ignorable="d">
+
+    <Grid x:Name="ContentArea">
+        
+
+        <muxc:TabView BorderBrush="AliceBlue" >
+    
+            <muxc:TabViewItem Header="Unit 01" BorderBrush="AliceBlue">
+                <controls:DataGrid
+    AutoGenerateColumns="False"
+    GridLinesVisibility="Horizontal"
+    ItemsSource="{x:Bind ReportsUnit1, Mode=OneWay}">
+                    <controls:DataGrid.Resources>
+                        <SolidColorBrush x:Key="DataGridColumnHeaderBackgroundColor" Color="Transparent" />
+                    </controls:DataGrid.Resources>
+                    <controls:DataGrid.Columns>
+                        <controls:DataGridTextColumn Binding="{Binding Token}" Header="ٹوکن" />
+                        <controls:DataGridTextColumn Binding="{Binding OperatorName}" Header="پمپ آپریٹر" />
+                        <controls:DataGridTextColumn Binding="{Binding Quantity}" Header="مقدار" />
+                        <controls:DataGridTextColumn Binding="{Binding Rate}" Header="فی لیٹر" />
+                        <controls:DataGridTextColumn Binding="{Binding TotalAmount}" Header="کل رقم" />
+                        <controls:DataGridTextColumn Binding="{Binding Date_Time}" Header="تاریخ/وقت" />
+                    </controls:DataGrid.Columns>
+                </controls:DataGrid>
+            </muxc:TabViewItem>
+
+            <muxc:TabViewItem Header="Unit 02" BorderBrush="AliceBlue" FontWeight="Bold" FontSize="25">
+                
+            </muxc:TabViewItem>
+
+        </muxc:TabView>
+        
+    </Grid>
+</Page>

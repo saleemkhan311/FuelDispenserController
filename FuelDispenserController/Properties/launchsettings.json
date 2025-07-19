@@ -1,0 +1,10 @@
+﻿{
+    "profiles": {
+      "FuelDispenserController (Package)": {
+        "commandName": "MsixPackage"
+      },
+      "FuelDispenserController (Unpackaged)": {
+        "commandName": "Project"
+      }
+    }
+}
