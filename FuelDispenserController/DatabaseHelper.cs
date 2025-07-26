@@ -7,7 +7,7 @@ using Microsoft.VisualBasic;
 using Windows.Storage;
 public static class DatabaseHelper
 {
-    private const string DatabaseFileName = "Data Source=C:\\Database\\DailyReport_Unit_1.db;";
+    private const string DatabaseFileName = "Data Source=C:\\Database\\FuelDispenserManagement.db;";
 
     public static void InitializeDatabase()
     {
@@ -16,27 +16,35 @@ public static class DatabaseHelper
 
         connection.Open();
 
+
         var command = connection.CreateCommand();
-        command.CommandText = @$"
-                CREATE TABLE IF NOT EXISTS DailyReport_Unit_1 (
-                    Token TEXT PRIMARY KEY,
-                    OperatorName TEXT,
-                    Quantity TEXT,
-                    Rate TEXT,
-                    TotalAmount TEXT,
-                    Date_Time TEXT
-                )";
-        command.ExecuteNonQuery();
+
+        for (var i = 1; i <= 4; i++)
+        {
+
+            command.CommandText = @$"
+                         CREATE TABLE IF NOT EXISTS DailyReport_Unit_{i} (
+                             Token TEXT PRIMARY KEY,
+                             OperatorName TEXT,
+                             Quantity TEXT,
+                             Rate TEXT,
+                             TotalAmount TEXT,
+                             Date_Time TEXT,
+                             User TEXT
+                         )";
+            command.ExecuteNonQuery();
+
+        }
     }
 
-    public static void AddReport(DailyReport report)
+    public static void AddReport(DailyReport report, string unitNo)
     {
-        using var connection = new Microsoft.Data.Sqlite.SqliteConnection("Data Source=C:\\Database\\DailyReport_Unit_1.db;");
+        using var connection = new Microsoft.Data.Sqlite.SqliteConnection(DatabaseFileName);
         connection.Open();
 
         var cmd = connection.CreateCommand();
-        cmd.CommandText = @"
-        INSERT INTO DailyReport_Unit_1 
+        cmd.CommandText = @$"
+        INSERT INTO DailyReport_Unit_{unitNo} 
         (Token, OperatorName, Quantity, Rate, TotalAmount, Date_Time) 
         VALUES (@Token, @OperatorName, @Quantity, @Rate, @TotalAmount, @Date_Time)";
 
@@ -50,5 +58,26 @@ public static class DatabaseHelper
     }
 
 
+    public static void InitializeUserDatabase(string dbPath)
+    {
+        using var connection = new Microsoft.Data.Sqlite.SqliteConnection(dbPath);
+        connection.Open();
+
+        var tableCmd = connection.CreateCommand();
+        tableCmd.CommandText =
+        @"
+        CREATE TABLE IF NOT EXISTS Users (
+        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+        Username TEXT NOT NULL UNIQUE,
+        Password TEXT NOT NULL,
+        RegistrationDate TEXT,
+        UserType TEXT NOT NULL DEFAULT 'User' -- Added UserType column
+        );
+        ";
+        tableCmd.ExecuteNonQuery();
+    }
+
 
 }
+
+

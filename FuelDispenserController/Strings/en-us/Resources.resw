@@ -137,7 +137,8 @@
     <value>Select an item from the list.</value>
   </data>
   <data name="Shell_ListDetails.Content" xml:space="preserve">
-    <value>ListDetails</value>
+    <value>User Management</value>
+    <comment>User Management</comment>
   </data>
   <data name="AppNotificationSamplePayload" xml:space="preserve">
     <value>&lt;toast launch="action=ToastClick"&gt;

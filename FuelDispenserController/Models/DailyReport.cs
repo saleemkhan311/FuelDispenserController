@@ -35,4 +35,9 @@ public class DailyReport
     {
         get; set;
     }
+
+    public string User
+    {
+        get; set;
+    }
 }

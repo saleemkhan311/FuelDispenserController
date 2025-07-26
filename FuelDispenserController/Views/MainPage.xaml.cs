@@ -21,56 +21,55 @@ public sealed partial class MainPage : Page
         get;
     }
 
-    readonly string connectionString = "Data Source=C:\\Database\\DailyReport_Unit_1.db;";
-    readonly string connectionString2 = "Data Source=C:\\Database\\DailyReport_Unit_2.db;";
-    readonly string connectionString3 = "Data Source=C:\\Database\\DailyReport_Unit_3.db;";
-    readonly string connectionString4 = "Data Source=C:\\Database\\DailyReport_Unit_4.db;";
+    static readonly string connectionString = "Data Source=C:\\Database\\FuelDispenserManagement.db;";
     public ObservableCollection<DailyReport> Reports { get; set; } = new();
 
 
 
     public MainPage()
     {
+        DatabaseHelper.InitializeDatabase();
         ViewModel = App.GetService<MainViewModel>();
         InitializeComponent();
 
-        SetBaseToken(connectionString, TokenTextBox1);
+        SetBaseToken(TokenTextBox1, "1");
+        SetBaseToken(TokenTextBox2, "2");
+        SetBaseToken(TokenTextBox3, "3");
+        SetBaseToken(TokenTextBox4, "4");
 
         DatabaseHelper.InitializeDatabase();
 
     }
 
-    void AddReport()
+    private string token;
+    private string operatorName;
+    private decimal quantity;
+    private decimal rate;
+    private decimal totalAmount;
+
+
+    void AddReport(string UnitNo)
     {
         var report = new DailyReport
         {
-            Token = TokenTextBox1.Text,
-            OperatorName = OperatorNameTextBox1.Text,
-            Quantity = decimal.Parse(QuantityTextBox1.Text),
-            Rate = decimal.Parse(RateTextBox1.Text),
-            TotalAmount = decimal.Parse(AmountTextBox1.Text),
+            Token = token,
+            OperatorName = operatorName,
+            Quantity = quantity,
+            Rate = rate,
+            TotalAmount = totalAmount,
             Date_Time = DateTime.Now
 
         };
 
-        DatabaseHelper.AddReport(report);
-
-
-        TokenTextBox1.Text = string.Empty;
-        QuantityTextBox1.Text = string.Empty;
-        RateTextBox1.Text = string.Empty;
-        AmountTextBox1.Text = string.Empty;
-
-
+        DatabaseHelper.AddReport(report, UnitNo);
     }
 
 
 
-    private async void PrintButton_Click(object sender, RoutedEventArgs e)
-    {
-        AddReport();
-        SetBaseToken(connectionString, TokenTextBox1);
-    }
+
+
+
+
 
     private async void CaptureButton_Click(object sender, RoutedEventArgs e)
     {
@@ -78,20 +77,51 @@ public sealed partial class MainPage : Page
 
     }
 
-   
+    private void EmptyBox(params TextBox[] textBoxes)
+    {
+        foreach(var box in textBoxes)
+        {
+            box.Text = string.Empty;
+        }
+    }
+
+    
+
+    private bool CheckValid(params TextBox[] textBoxes)
+    {
+        var check = false;
+
+        //TextBox[] textBoxes = { tokenBox, helperBox, qunatityBox, rateBox, amountBox };
+
+        foreach (TextBox textBox in textBoxes)
+        {
+            if (textBox.Text != string.Empty)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        return check;
+    }
 
 
-   
 
-    public static void SetBaseToken(string connectionString, TextBox tokenTextBox)
+
+
+
+    public static void SetBaseToken(TextBox tokenTextBox, string UnitNo)
     {
         string lastToken = null;
 
-        using var connection = new Microsoft.Data.Sqlite.SqliteConnection(connectionString);
+        using var connection = new Microsoft.Data.Sqlite.SqliteConnection($"{connectionString}");
         connection.Open();
 
         using var cmd = connection.CreateCommand();
-        cmd.CommandText = "SELECT Token FROM DailyReport_Unit_1 ORDER BY ROWID DESC LIMIT 1";
+        cmd.CommandText = $"SELECT Token FROM DailyReport_Unit_{UnitNo} ORDER BY ROWID DESC LIMIT 1";
         using var reader = cmd.ExecuteReader();
 
         if (reader.Read())
@@ -101,9 +131,12 @@ public sealed partial class MainPage : Page
 
         string numericPart = new string(lastToken?.TakeWhile(char.IsDigit).ToArray() ?? Array.Empty<char>());
 
-        if (string.IsNullOrEmpty(numericPart) || !int.TryParse(numericPart, out int numericToken) || numericToken < 1000)
+        int.TryParse(UnitNo, out int unitNumber);
+        int baseToken = unitNumber * 1000;
+
+        if (string.IsNullOrEmpty(numericPart) || !int.TryParse(numericPart, out int numericToken) || numericToken < baseToken)
         {
-            tokenTextBox.Text = "1000";
+            tokenTextBox.Text = baseToken.ToString();
         }
         else
         {
@@ -112,65 +145,118 @@ public sealed partial class MainPage : Page
     }
 
 
-
-
-
-    private void AddButton_Click4(object sender, RoutedEventArgs e) => throw new NotImplementedException();
-    private void PrintButton_Click4(object sender, RoutedEventArgs e) => throw new NotImplementedException();
-    private void PrintButton_Click2(object sender, RoutedEventArgs e) => throw new NotImplementedException();
-    private void PrintButton_Click3(object sender, RoutedEventArgs e) => throw new NotImplementedException();
-    private void AddButton_Click3(object sender, RoutedEventArgs e) => throw new NotImplementedException();
-    private void AddButton_Click2(object sender, RoutedEventArgs e) => throw new NotImplementedException();
-
-
-    /* public static void SetNextToken(string connectionString, TextBox tokenTextBox)
+    private async void PrintButton_Click(object sender, RoutedEventArgs e)
     {
-        string lastToken = null;
-
-        using var connection = new Microsoft.Data.Sqlite.SqliteConnection(connectionString);
-        connection.Open();
-
-        using var cmd = connection.CreateCommand();
-        cmd.CommandText = "SELECT Token FROM DailyReport_Unit_1 ORDER BY ROWID DESC LIMIT 1";
-        using var reader = cmd.ExecuteReader();
-
-        if (reader.Read())
+        if (CheckValid(TokenTextBox1, OperatorNameTextBox1, QuantityTextBox1, RateTextBox1, AmountTextBox1))
         {
-            lastToken = reader.GetString(0);
-        }
+            token = TokenTextBox1.Text;
+            operatorName = OperatorNameTextBox1.Text;
+            quantity = decimal.Parse(QuantityTextBox1.Text);
+            rate
+                = decimal.Parse(RateTextBox1.Text);
+            totalAmount = decimal.Parse(AmountTextBox1.Text);
 
-        if (string.IsNullOrEmpty(lastToken))
-        {
-            tokenTextBox.Text = "1000";
-            return;
-        }
+            AddReport("1");
+            SetBaseToken(TokenTextBox1, "1");
+            EmptyBox(QuantityTextBox1, RateTextBox1, AmountTextBox1);
 
-        // Check if last token ends with a letter (suffix like A, B, C...)
-        if (char.IsLetter(lastToken[^1]))
-        {
-            // Extract numeric part and letter suffix
-            string numericPart = new string(lastToken.TakeWhile(char.IsDigit).ToArray());
-            char lastChar = lastToken[^1];
-
-            if (char.ToUpper(lastChar) < 'Z')
-            {
-                // Increment letter (A -> B, B -> C, ...)
-                char nextSuffix = (char)(char.ToUpper(lastChar) + 1);
-                tokenTextBox.Text = numericPart + nextSuffix;
-            }
-            else
-            {
-                // Reset back to base token if Z is reached (optional logic)
-                tokenTextBox.Text = numericPart;
-            }
         }
         else
         {
-            // No suffix → start suffix with 'A'
-            tokenTextBox.Text = lastToken + "A";
+            var dialog = new ContentDialog
+            {
+                Title = "Invalid Input Unit 01",
+                Content = "Please fill in all fields before printing.",
+                CloseButtonText = "OK"
+            };
+            await dialog.ShowAsync();
         }
-    }*/
+    }
+
+    private void PrintButton_Click2(object sender, RoutedEventArgs e)
+    {
+        if (CheckValid(TokenTextBox2, OperatorNameTextBox2, QuantityTextBox2, RateTextBox2, AmountTextBox2))
+        {
+            token = TokenTextBox2.Text;
+            operatorName = OperatorNameTextBox2.Text;
+            quantity = decimal.Parse(QuantityTextBox2.Text);
+            rate = decimal.Parse(RateTextBox2.Text);
+            totalAmount = decimal.Parse(AmountTextBox2.Text);
 
 
+            AddReport("2");
+            SetBaseToken(TokenTextBox2, "2");
+            EmptyBox(QuantityTextBox2, RateTextBox2, AmountTextBox2);
+        }
+        else
+        {
+            var dialog = new ContentDialog
+            {
+                Title = "Invalid Input Unit 02",
+                Content = "Please fill in all fields before printing.",
+                CloseButtonText = "OK"
+            };
+            dialog.ShowAsync();
+        }
+    }
+
+    private void PrintButton_Click3(object sender, RoutedEventArgs e)
+    {
+        if (CheckValid(TokenTextBox3, OperatorNameTextBox3, QuantityTextBox3, RateTextBox3, AmountTextBox3))
+        {
+            token = TokenTextBox3.Text;
+            operatorName = OperatorNameTextBox3.Text;
+            
+            quantity = decimal.Parse(QuantityTextBox3.Text);
+
+            rate = decimal.Parse(RateTextBox3.Text);
+            totalAmount = decimal.Parse(AmountTextBox3.Text);
+
+
+            AddReport("3");
+            SetBaseToken(TokenTextBox3, "3");
+            EmptyBox(QuantityTextBox3, RateTextBox3, AmountTextBox3);
+        }
+        else
+        {
+            var dialog = new ContentDialog
+            {
+                Title = "Invalid Input Unit 03",
+                Content = "Please fill in all fields before printing.",
+                CloseButtonText = "OK"
+            };
+            dialog.ShowAsync();
+        }
+    }
+
+    private void PrintButton_Click4(object sender, RoutedEventArgs e)
+    {
+        if (CheckValid(TokenTextBox4, OperatorNameTextBox4, QuantityTextBox4, RateTextBox4, AmountTextBox4))
+        {
+
+            token = TokenTextBox4.Text;
+            operatorName = OperatorNameTextBox4.Text;
+            quantity = decimal.Parse(QuantityTextBox4.Text);
+            rate = decimal.Parse(RateTextBox4.Text);
+            totalAmount = decimal.Parse(AmountTextBox4.Text);
+
+
+
+            AddReport("4");
+            SetBaseToken(TokenTextBox4, "4");
+            EmptyBox(QuantityTextBox4, RateTextBox4, AmountTextBox4);
+        }
+        else
+        {
+            var dialog = new ContentDialog
+            {
+                Title = "Invalid Input Unit 04",
+                Content = "Please fill in all fields before printing.",
+                CloseButtonText = "OK",
+                XamlRoot = this.XamlRoot, 
+            };
+            dialog.ShowAsync();
+        }
+    }
 
 }

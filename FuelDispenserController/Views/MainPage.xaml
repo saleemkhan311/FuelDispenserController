@@ -12,81 +12,78 @@
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
 
             <Grid MaxWidth="1370">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Column="0" Margin="10" Background="#F4A28C" Padding="10" CornerRadius="10">
-                <StackPanel Orientation="Vertical" Background="Black" Padding="3" CornerRadius="5">
-                    <TextBlock Text="یونٹ 01" FontSize="25" FontWeight="Medium" HorizontalAlignment="Center" Margin="0,0,0,2" FontFamily="Arabic Typesetting" Padding="5"/>
-                </StackPanel>
+                <StackPanel Grid.Column="0" Margin="10" Background="#F4A28C" Padding="10" CornerRadius="10">
+                    <StackPanel Orientation="Vertical" Background="Black" Padding="3" CornerRadius="5">
+                        <TextBlock Text="یونٹ 01" FontSize="25" FontWeight="Medium" HorizontalAlignment="Center" Margin="0,0,0,2" FontFamily="Arabic Typesetting" Padding="5"/>
+                    </StackPanel>
 
-                <TextBlock Text="ٹوکن" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold" FlowDirection="RightToLeft" Padding="5" />
+                    <TextBlock Text="ٹوکن" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold" FlowDirection="RightToLeft" Padding="5" />
                     <TextBox PlaceholderText="Enter Token" Margin="0,0,0,5" x:Name="TokenTextBox1" FontWeight="Bold" FontSize="19" IsReadOnly="True"/>
 
-                <TextBlock Text="پمپ آپریٹر کا نام" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold" FlowDirection="RightToLeft" Padding="5" />
+                    <TextBlock Text="پمپ آپریٹر کا نام" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold" FlowDirection="RightToLeft" Padding="5" />
                     <TextBox PlaceholderText="Enter Helper Name" Margin="0,0,0,5" x:Name="OperatorNameTextBox1"/>
 
-                <TextBlock Text="مقدار" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold"  FlowDirection="RightToLeft" Padding="5"/>
+                    <TextBlock Text="مقدار" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold"  FlowDirection="RightToLeft" Padding="5"/>
                     <TextBox PlaceholderText="Enter Quantity" Margin="5" x:Name="QuantityTextBox1" />
 
-                <TextBlock Text="فی لیٹر" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold"  FlowDirection="RightToLeft" Padding="5"/>
+                    <TextBlock Text="فی لیٹر" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold"  FlowDirection="RightToLeft" Padding="5"/>
                     <TextBox PlaceholderText="Enter Rate" Margin="5" x:Name="RateTextBox1"  />
-                
-                <TextBlock Text="کل رقم" Margin="0,10,0,0" TextAlignment="Left" FontSize="25" FlowDirection="RightToLeft" FontFamily="Arabic Typesetting" Padding="5" />
+
+                    <TextBlock Text="کل رقم" Margin="0,10,0,0" TextAlignment="Left" FontSize="25" FlowDirection="RightToLeft" FontFamily="Arabic Typesetting" Padding="5" />
                     <TextBox PlaceholderText="Enter Amount" Margin="0,0,0,5" x:Name="AmountTextBox1" />
 
-                <TextBlock Text="Live Camera View" FontWeight="Bold" Margin="0,10,0,5"/>
+                    <TextBlock Text="Live Camera View" FontWeight="Bold" Margin="0,10,0,5"/>
                     <Image Source="/Assets/cam.jpeg" Stretch="Uniform" Margin="0,0,0,10"/>
-                
-                
-                
-                <!-- Buttons -->
-                <StackPanel Orientation="Vertical" Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="5">
+
+
+
+                    <!-- Buttons -->
+                    <StackPanel Orientation="Vertical" Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="5">
                         <Button Content="Capture"  Background="#0078D7" Foreground="White" Width="200"/>
                         <Button Content="Print"  Background="#0078D7" Foreground="White" Width="200" Click="PrintButton_Click" />
                         <Button Content="Unit On"  Background="#0078D7" Foreground="White" Width="200" />
+                    </StackPanel>
+
+
                 </StackPanel>
 
+                <!--UNIT 02-->
 
-            </StackPanel>
+                <StackPanel Grid.Column="1" Margin="10" Background="#F4A28C" Padding="10" CornerRadius="10">
+                    <StackPanel Orientation="Vertical" Background="Black" Padding="3" CornerRadius="5">
+                        <TextBlock Text="یونٹ 02" FontSize="25" FontWeight="Medium" HorizontalAlignment="Center" Margin="0,0,0,2" FontFamily="Arabic Typesetting" Padding="5"/>
+                    </StackPanel>
 
-            <!--UNIT 02-->
-
-            <StackPanel Grid.Column="1" Margin="10" Background="#F4A28C" Padding="10" CornerRadius="10">
-                <StackPanel Orientation="Vertical" Background="Black" Padding="3" CornerRadius="5">
-                    <TextBlock Text="یونٹ 02" FontSize="25" FontWeight="Medium" HorizontalAlignment="Center" Margin="0,0,0,2" FontFamily="Arabic Typesetting" Padding="5"/>
-                </StackPanel>
-
-                <TextBlock Text="ٹوکن" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold" FlowDirection="RightToLeft" Padding="5" />
+                    <TextBlock Text="ٹوکن" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold" FlowDirection="RightToLeft" Padding="5" />
                     <TextBox PlaceholderText="Enter Token" Margin="0,0,0,5" x:Name="TokenTextBox2" FontWeight="Bold" FontSize="19" IsReadOnly="True"/>
 
                     <TextBlock Text="پمپ آپریٹر کا نام" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold" FlowDirection="RightToLeft" Padding="5" />
-                <TextBox PlaceholderText="Enter Helper Name" Margin="0,0,0,5"/>
+                    <TextBox PlaceholderText="Enter Helper Name" Margin="0,0,0,5" x:Name="OperatorNameTextBox2"/>
 
-                <TextBlock Text="مقدار" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold"  FlowDirection="RightToLeft" Padding="5"/>
-                <TextBox PlaceholderText="Enter Quantity" Margin="5"/>
+                    <TextBlock Text="مقدار" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold"  FlowDirection="RightToLeft" Padding="5"/>
+                    <TextBox PlaceholderText="Enter Quantity" Margin="5" x:Name="QuantityTextBox2" />
 
-                <TextBlock Text="فی لیٹر" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold"  FlowDirection="RightToLeft" Padding="5"/>
-                <TextBox PlaceholderText="Enter Rate" Margin="5"/>
+                    <TextBlock Text="فی لیٹر" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold"  FlowDirection="RightToLeft" Padding="5"/>
+                    <TextBox PlaceholderText="Enter Rate" Margin="5" x:Name="RateTextBox2"  />
 
+                    <TextBlock Text="کل رقم" Margin="0,10,0,0" TextAlignment="Left" FontSize="25" FlowDirection="RightToLeft" FontFamily="Arabic Typesetting" Padding="5" />
+                    <TextBox PlaceholderText="Enter Amount" Margin="0,0,0,5" x:Name="AmountTextBox2" />
 
-                <TextBlock Text="کل رقم" Margin="0,10,0,0" TextAlignment="Left" FontSize="25" FlowDirection="RightToLeft" FontFamily="Arabic Typesetting" Padding="5" />
-                <TextBox PlaceholderText="Enter Amount" Margin="0,0,0,5"/>
-
-                <TextBlock Text="Live Camera View" FontWeight="Bold" Margin="0,10,0,5"/>
-                <Image Source="/Assets/cam.jpeg" Stretch="Uniform" Margin="0,0,0,10"/>
-
+                    <TextBlock Text="Live Camera View" FontWeight="Bold" Margin="0,10,0,5"/>
+                    <Image Source="/Assets/cam.jpeg" Stretch="Uniform" Margin="0,0,0,10"/>
 
 
-                <!-- Buttons -->
+
+                    <!-- Buttons -->
                     <StackPanel Orientation="Vertical" Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="5">
                         <Button Content="Capture"  Background="#0078D7" Foreground="White" Width="200"/>
-                        <Button Content="Add"  Background="#0078D7" Foreground="White" Width="200" Click="AddButton_Click2"/>
-                        <Button Content="Next" Background="#0078D7" Foreground="White" Width="200" />
                         <Button Content="Print"  Background="#0078D7" Foreground="White" Width="200" Click="PrintButton_Click2" />
                         <Button Content="Unit On"  Background="#0078D7" Foreground="White" Width="200" />
                     </StackPanel>
@@ -96,40 +93,37 @@
 
 
 
-            <!--UNIT 03-->
+                <!--UNIT 03-->
 
 
-            <StackPanel Grid.Column="2" Margin="10" Background="#F4A28C" Padding="10" CornerRadius="10">
-                <StackPanel Orientation="Vertical" Background="Black" Padding="3" CornerRadius="5">
-                    <TextBlock Text="یونٹ 03" FontSize="25" FontWeight="Medium" HorizontalAlignment="Center" Margin="0,0,0,2" FontFamily="Arabic Typesetting" Padding="5"/>
-                </StackPanel>
+                <StackPanel Grid.Column="2" Margin="10" Background="#F4A28C" Padding="10" CornerRadius="10">
+                    <StackPanel Orientation="Vertical" Background="Black" Padding="3" CornerRadius="5">
+                        <TextBlock Text="یونٹ 03" FontSize="25" FontWeight="Medium" HorizontalAlignment="Center" Margin="0,0,0,2" FontFamily="Arabic Typesetting" Padding="5"/>
+                    </StackPanel>
 
-                <TextBlock Text="ٹوکن" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold" FlowDirection="RightToLeft" Padding="5" />
+                    <TextBlock Text="ٹوکن" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold" FlowDirection="RightToLeft" Padding="5" />
                     <TextBox PlaceholderText="Enter Token" Margin="0,0,0,5" x:Name="TokenTextBox3" FontWeight="Bold" FontSize="19" IsReadOnly="True"/>
 
                     <TextBlock Text="پمپ آپریٹر کا نام" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold" FlowDirection="RightToLeft" Padding="5" />
-                <TextBox PlaceholderText="Enter Helper Name" Margin="0,0,0,5"/>
+                    <TextBox PlaceholderText="Enter Helper Name" Margin="0,0,0,5" x:Name="OperatorNameTextBox3"/>
 
-                <TextBlock Text="مقدار" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold"  FlowDirection="RightToLeft" Padding="5"/>
-                <TextBox PlaceholderText="Enter Quantity" Margin="5"/>
+                    <TextBlock Text="مقدار" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold"  FlowDirection="RightToLeft" Padding="5"/>
+                    <TextBox PlaceholderText="Enter Quantity" Margin="5" x:Name="QuantityTextBox3" />
 
-                <TextBlock Text="فی لیٹر" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold"  FlowDirection="RightToLeft" Padding="5"/>
-                <TextBox PlaceholderText="Enter Rate" Margin="5"/>
+                    <TextBlock Text="فی لیٹر" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold"  FlowDirection="RightToLeft" Padding="5"/>
+                    <TextBox PlaceholderText="Enter Rate" Margin="5" x:Name="RateTextBox3"  />
 
+                    <TextBlock Text="کل رقم" Margin="0,10,0,0" TextAlignment="Left" FontSize="25" FlowDirection="RightToLeft" FontFamily="Arabic Typesetting" Padding="5" />
+                    <TextBox PlaceholderText="Enter Amount" Margin="0,0,0,5" x:Name="AmountTextBox3" />
 
-                <TextBlock Text="کل رقم" Margin="0,10,0,0" TextAlignment="Left" FontSize="25" FlowDirection="RightToLeft" FontFamily="Arabic Typesetting" Padding="5" />
-                <TextBox PlaceholderText="Enter Amount" Margin="0,0,0,5"/>
-
-                <TextBlock Text="Live Camera View" FontWeight="Bold" Margin="0,10,0,5"/>
-                <Image Source="/Assets/cam.jpeg" Stretch="Uniform" Margin="0,0,0,10"/>
-
+                    <TextBlock Text="Live Camera View" FontWeight="Bold" Margin="0,10,0,5"/>
+                    <Image Source="/Assets/cam.jpeg" Stretch="Uniform" Margin="0,0,0,10"/>
 
 
-                <!-- Buttons -->
+
+                    <!-- Buttons -->
                     <StackPanel Orientation="Vertical" Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="5">
                         <Button Content="Capture"  Background="#0078D7" Foreground="White" Width="200"/>
-                        <Button Content="Add"  Background="#0078D7" Foreground="White" Width="200" Click="AddButton_Click3"/>
-                        <Button Content="Next" Background="#0078D7" Foreground="White" Width="200" />
                         <Button Content="Print"  Background="#0078D7" Foreground="White" Width="200" Click="PrintButton_Click3" />
                         <Button Content="Unit On"  Background="#0078D7" Foreground="White" Width="200" />
                     </StackPanel>
@@ -138,52 +132,46 @@
                 </StackPanel>
 
 
-            <!--UNIT 04-->
+                <!--UNIT 04-->
 
 
-            <StackPanel Grid.Column="3" Margin="10" Background="#F4A28C" Padding="10" CornerRadius="10">
-                <StackPanel Orientation="Vertical" Background="Black" Padding="3" CornerRadius="5">
-                    <TextBlock Text="یونٹ 04" FontSize="25" FontWeight="Medium" HorizontalAlignment="Center" Margin="0,0,0,2" FontFamily="Arabic Typesetting" Padding="5"/>
-                </StackPanel>
+                <StackPanel Grid.Column="3" Margin="10" Background="#F4A28C" Padding="10" CornerRadius="10">
+                    <StackPanel Orientation="Vertical" Background="Black" Padding="3" CornerRadius="5">
+                        <TextBlock Text="یونٹ 04" FontSize="25" FontWeight="Medium" HorizontalAlignment="Center" Margin="0,0,0,2" FontFamily="Arabic Typesetting" Padding="5"/>
+                    </StackPanel>
 
-                <TextBlock Text="ٹوکن" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold" FlowDirection="RightToLeft" Padding="5" />
-                <TextBox PlaceholderText="Enter Token" Margin="0,0,0,5" x:Name="TokenTextBox4" FontWeight="Bold" FontSize="19" IsReadOnly="True"/>
+                    <TextBlock Text="ٹوکن" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold" FlowDirection="RightToLeft" Padding="5" />
+                    <TextBox PlaceholderText="Enter Token" Margin="0,0,0,5" x:Name="TokenTextBox4" FontWeight="Bold" FontSize="19" IsReadOnly="True"/>
 
-                <TextBlock Text="پمپ آپریٹر کا نام" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold" FlowDirection="RightToLeft" Padding="5" />
-                <TextBox PlaceholderText="Enter Helper Name" Margin="0,0,0,5"/>
+                    <TextBlock Text="پمپ آپریٹر کا نام" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold" FlowDirection="RightToLeft" Padding="5" />
+                    <TextBox PlaceholderText="Enter Helper Name" Margin="0,0,0,5" x:Name="OperatorNameTextBox4"/>
 
-                <TextBlock Text="مقدار" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold"  FlowDirection="RightToLeft" Padding="5"/>
-                <TextBox PlaceholderText="Enter Quantity" Margin="5"/>
+                    <TextBlock Text="مقدار" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold"  FlowDirection="RightToLeft" Padding="5"/>
+                    <TextBox PlaceholderText="Enter Quantity" Margin="5" x:Name="QuantityTextBox4" />
 
-                <TextBlock Text="فی لیٹر" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold"  FlowDirection="RightToLeft" Padding="5"/>
-                <TextBox PlaceholderText="Enter Rate" Margin="5"/>
+                    <TextBlock Text="فی لیٹر" FontSize="25" FontFamily="Arabic Typesetting" FontWeight="Bold"  FlowDirection="RightToLeft" Padding="5"/>
+                    <TextBox PlaceholderText="Enter Rate" Margin="5" x:Name="RateTextBox4"  />
 
+                    <TextBlock Text="کل رقم" Margin="0,10,0,0" TextAlignment="Left" FontSize="25" FlowDirection="RightToLeft" FontFamily="Arabic Typesetting" Padding="5" />
+                    <TextBox PlaceholderText="Enter Amount" Margin="0,0,0,5" x:Name="AmountTextBox4" />
 
-                <TextBlock Text="کل رقم" Margin="0,10,0,0" TextAlignment="Left" FontSize="25" FlowDirection="RightToLeft" FontFamily="Arabic Typesetting" Padding="5" />
-                <TextBox PlaceholderText="Enter Amount" Margin="0,0,0,5"/>
-
-                <TextBlock Text="Live Camera View" FontWeight="Bold" Margin="0,10,0,5"/>
-                <Image Source="/Assets/cam.jpeg" Stretch="Uniform" Margin="0,0,0,10"/>
-
+                    <TextBlock Text="Live Camera View" FontWeight="Bold" Margin="0,10,0,5"/>
+                    <Image Source="/Assets/cam.jpeg" Stretch="Uniform" Margin="0,0,0,10"/>
 
 
-                <!-- Buttons -->
+
+                    <!-- Buttons -->
                     <StackPanel Orientation="Vertical" Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="5">
                         <Button Content="Capture"  Background="#0078D7" Foreground="White" Width="200"/>
-                        <Button Content="Add"  Background="#0078D7" Foreground="White" Width="200" Click="AddButton_Click4"/>
-                        <Button Content="Next" Background="#0078D7" Foreground="White" Width="200" />
                         <Button Content="Print"  Background="#0078D7" Foreground="White" Width="200" Click="PrintButton_Click4" />
                         <Button Content="Unit On"  Background="#0078D7" Foreground="White" Width="200" />
                     </StackPanel>
 
 
+                    
+
                 </StackPanel>
-
-            
-
-
-        </Grid>
-
-            </ScrollViewer>
+            </Grid>
+        </ScrollViewer>
     </Grid>
 </Page>

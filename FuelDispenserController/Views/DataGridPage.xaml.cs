@@ -5,6 +5,7 @@ using FuelDispenserController.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.Data.Sqlite;
+using FuelDispenserController.Services;
 
 namespace FuelDispenserController.Views;
 
@@ -12,45 +13,108 @@ namespace FuelDispenserController.Views;
 // For more details, see the documentation at https://docs.microsoft.com/windows/communitytoolkit/controls/datagrid.
 public sealed partial class DataGridPage : Page
 {
-    private const string DatabaseFilePath = "Data Source=C:\\Database\\DailyReport_Unit_1.db;";
+    private const string DatabaseFilePath = "Data Source=C:\\Database\\FuelDispenserManagement.db;";
 
     public ObservableCollection<DailyReport> ReportsUnit1 { get; set; } = new();
     public ObservableCollection<DailyReport> ReportsUnit2 { get; set; } = new();
+    public ObservableCollection<DailyReport> ReportsUnit3 { get; set; } = new();
+    public ObservableCollection<DailyReport> ReportsUnit4 { get; set; } = new();
+    public ObservableCollection<DailyReport> Reports { get; set; } = new();
+
+
 
     public DataGridPage()
     {
         this.InitializeComponent();
-        LoadReport();
+        LoadReport("1");
+        UnitOptions = new List<string> { "Unit 1", "Unit 2", "Unit 3", "Unit 4" };
     }
 
-    
+  
 
-    private void LoadReport()
+    private void LoadReport(string unitNo)
     {
-        ReportsUnit1.Clear();
+        Reports.Clear();
 
         using var connection = new Microsoft.Data.Sqlite.SqliteConnection(DatabaseFilePath);
         connection.Open();
 
         using var cmd = connection.CreateCommand();
 
-        cmd.CommandText = "SELECT * FROM DailyReport_Unit_1";
+        cmd.CommandText = $"SELECT * FROM DailyReport_Unit_{unitNo}";
 
         using var reader = cmd.ExecuteReader();
         while (reader.Read())
         {
-            ReportsUnit1.Add(new DailyReport
+            Reports.Add(new DailyReport
             {
                 Token = reader.GetString(0),
                 OperatorName = reader.GetString(1),
                 Quantity = decimal.Parse(reader.GetString(2)),
                 Rate = decimal.Parse(reader.GetString(3)),
                 TotalAmount = decimal.Parse(reader.GetString(4)),
-                Date_Time = DateTime.Parse(reader.GetString(5))
+                Date_Time = DateTime.Parse(reader.GetString(5)),
+                User = reader.IsDBNull(6) ? "none" : reader.GetString(6)
             });
         }
 
 
     }
 
+    public List<string> UnitOptions
+    {
+        get; set;
+    }
+
+    int selectedUnit;
+    private void UnitSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        selectedUnit = UnitSelector.SelectedIndex+1;
+        string unitNo = selectedUnit.ToString();
+        LoadReport(unitNo);
+    }
+
+    private async void DeleteButton_Click(object sender, RoutedEventArgs e)
+    {
+
+        if (DatabaseTable.SelectedItem is DailyReport selectedReport)
+        {
+            var unitNo = selectedUnit.ToString();
+
+            var dialog = new ContentDialog
+            {
+                Title = "Delete Report",
+                Content = $"Are you sure you want to delete the report for {selectedReport.Token} From Unit 0{selectedUnit}?",
+                PrimaryButtonText = "Delete",
+                CloseButtonText = "Cancel",
+                XamlRoot = this.XamlRoot
+
+            };
+
+            var item = selectedReport.Token;
+            var result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                
+                DailyReportService.DeleteItem(unitNo, item);
+                LoadReport(unitNo);
+            }
+
+        }
+        else
+        {
+
+        }
+            
+    }
+
+    private void UpdateButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (DatabaseTable.SelectedItem is DailyReport selectedReport)
+        {
+            // Update logic here
+            // For example, you can open a dialog to edit the selected report
+            // and then save the changes back to the database.
+        }
+    }
 }

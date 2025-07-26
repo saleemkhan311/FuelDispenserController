@@ -12,61 +12,44 @@
         IsTabStop="True">
         <StackPanel HorizontalAlignment="Left">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                <FontIcon
-                    HorizontalAlignment="Center"
+               
+             <!--   <TextBlock
+                    Margin="10"
                     VerticalAlignment="Center"
-                    FontSize="48"
-                    Glyph="{x:Bind ListDetailsMenuItem.Symbol, Mode=OneWay}"
-                    AutomationProperties.Name="{x:Bind ListDetailsMenuItem.SymbolName, Mode=OneWay}"  />
-                <TextBlock
-                    Margin="{StaticResource SmallLeftMargin}"
-                    VerticalAlignment="Center"
-                    Text="{x:Bind ListDetailsMenuItem.Company, Mode=OneWay}"
-                    Style="{ThemeResource TitleTextBlockStyle}" />
+                    Text="User Managment" 
+                    FontSize="25"
+                    FontWeight="Bold"
+                     />-->
             </StackPanel>
             <StackPanel Padding="0,15,0,0">
-                <TextBlock Text="Status" Style="{StaticResource DetailSubTitleStyle}" />
 
-                <TextBlock Text="{x:Bind ListDetailsMenuItem.Status, Mode=OneWay}" Style="{StaticResource DetailBodyBaseMediumStyle}" />
+                <StackPanel Width="400" Height="600" Padding="20" Spacing="12"
+            Background="White" CornerRadius="12" BorderBrush="LightGray" BorderThickness="1">
 
-                <TextBlock
-                    Margin="{StaticResource SmallTopMargin}"
-                    Text="Order date"
-                    Style="{StaticResource DetailSubTitleStyle}" />
-                <TextBlock Text="{x:Bind ListDetailsMenuItem.OrderDate, Mode=OneWay}" Style="{StaticResource DetailBodyBaseMediumStyle}" />
-                <TextBlock
-                    Margin="{StaticResource SmallTopMargin}"
-                    Text="Company"
-                    Style="{StaticResource DetailSubTitleStyle}" />
-                <TextBlock Text="{x:Bind ListDetailsMenuItem.Company, Mode=OneWay}" Style="{StaticResource DetailBodyBaseMediumStyle}" />
+                    <TextBlock Text="Register New User" FontSize="20" FontWeight="Bold" Margin="0,0,0,10"/>
 
-                <TextBlock
-                    Margin="{StaticResource SmallTopMargin}"
-                    Text="Ship to"
-                    Style="{StaticResource DetailSubTitleStyle}" />
-                <TextBlock Text="{x:Bind ListDetailsMenuItem.ShipTo, Mode=OneWay}" Style="{StaticResource DetailBodyBaseMediumStyle}" />
-                <TextBlock
-                    Margin="{StaticResource SmallTopMargin}"
-                    Text="Order total"
-                    Style="{StaticResource DetailSubTitleStyle}" />
-                <TextBlock Text="{x:Bind ListDetailsMenuItem.OrderTotal, Mode=OneWay}" Style="{StaticResource DetailBodyBaseMediumStyle}" />
+                    <TextBlock Text="Display Name"/>
+                    <TextBox x:Name="DisplayNameTextBox" PlaceholderText="Enter full name"/>
 
-                <TextBlock
-                    Margin="{StaticResource MediumTopMargin}"
-                    Text="Note 1"
-                    Style="{StaticResource DetailSubTitleStyle}" />
-                <TextBlock
-                    Style="{StaticResource DetailBodyStyle}"
-                    Text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis quis hendrerit nulla, vel molestie libero. In nec ultricies magna, ultricies molestie ipsum. Mauris non dignissim velit. Etiam malesuada blandit mauris eu maximus. Quisque ornare, felis nec scelerisque mollis, risus dolor posuere magna, in gravida quam mi id nisi. Nullam mattis consequat ex. Cras nulla neque, dictum ac urna et, vestibulum feugiat ex. Pellentesque malesuada accumsan ligula, vel fringilla lacus facilisis sit amet. Proin convallis tempor arcu, ac placerat libero pretium ut. Praesent hendrerit nisl at lobortis viverra. Fusce vitae velit odio. Nam ut tortor sed purus finibus sollicitudin quis at ante. Ut sodales dolor vel eros mollis suscipit. Donec eu nulla id urna ultricies consequat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;" />
+                    <TextBlock Text="Username"/>
+                    <TextBox x:Name="UsernameTextBox" PlaceholderText="Choose a username"/>
 
-                <TextBlock
-                    Margin="{StaticResource SmallTopMargin}"
-                    Text="Note 2"
-                    Style="{StaticResource DetailSubTitleStyle}" />
-                <TextBlock
-                    Margin="{StaticResource MediumBottomMargin}"
-                    Style="{StaticResource DetailBodyStyle}"
-                    Text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis quis hendrerit nulla, vel molestie libero. In nec ultricies magna, ultricies molestie ipsum. Mauris non dignissim velit. Etiam malesuada blandit mauris eu maximus. Quisque ornare, felis nec scelerisque mollis, risus dolor posuere magna, in gravida quam mi id nisi. Nullam mattis consequat ex. Cras nulla neque, dictum ac urna et, vestibulum feugiat ex. Pellentesque malesuada accumsan ligula, vel fringilla lacus facilisis sit amet. Proin convallis tempor arcu, ac placerat libero pretium ut. Praesent hendrerit nisl at lobortis viverra. Fusce vitae velit odio. Nam ut tortor sed purus finibus sollicitudin quis at ante. Ut sodales dolor vel eros mollis suscipit. Donec eu nulla id urna ultricies consequat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;" />
+                    <TextBlock Text="Password"/>
+                    <PasswordBox x:Name="PasswordBox" PlaceholderText="Enter password"/>
+
+                    <TextBlock Text="Confirm Password"/>
+                    <PasswordBox x:Name="ConfirmPasswordBox" PlaceholderText="Re-enter password"/>
+
+                    <TextBlock Text="Profile Picture"/>
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Image x:Name="ProfileImage" Width="64" Height="64" Stretch="UniformToFill" 
+               Source="/Assets/DefaultAvatar.png" />
+                        <Button Content="Upload" />
+                    </StackPanel>
+
+                    <Button Content="Register" Margin="0,20,0,0" Height="40" />
+                </StackPanel>
+
             </StackPanel>
         </StackPanel>
     </ScrollViewer>
