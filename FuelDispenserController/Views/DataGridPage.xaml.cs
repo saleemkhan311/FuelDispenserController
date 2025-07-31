@@ -50,9 +50,9 @@ public sealed partial class DataGridPage : Page
             {
                 Token = reader.GetString(0),
                 OperatorName = reader.GetString(1),
-                Quantity = decimal.Parse(reader.GetString(2)),
-                Rate = decimal.Parse(reader.GetString(3)),
-                TotalAmount = decimal.Parse(reader.GetString(4)),
+                Quantity = double.Parse(reader.GetString(2)),
+                Rate = double.Parse(reader.GetString(3)),
+                TotalAmount = double.Parse(reader.GetString(4)),
                 Date_Time = DateTime.Parse(reader.GetString(5)),
                 User = reader.IsDBNull(6) ? "none" : reader.GetString(6)
             });
@@ -108,13 +108,31 @@ public sealed partial class DataGridPage : Page
             
     }
 
-    private void UpdateButton_Click(object sender, RoutedEventArgs e)
+    private async void UpdateButton_Click(object sender, RoutedEventArgs e)
     {
         if (DatabaseTable.SelectedItem is DailyReport selectedReport)
         {
-            // Update logic here
-            // For example, you can open a dialog to edit the selected report
-            // and then save the changes back to the database.
+           
+
+            var dialog = new ContentDialog()
+            {
+
+                Title = "Update Report",
+                Content = $"Are you sure you want to Update the report for {selectedReport.Token} From Unit 0{selectedUnit}?",
+                PrimaryButtonText = "Update",
+                CloseButtonText = "Cancel",
+                XamlRoot = this.XamlRoot
+
+            };
+
+            var result = await dialog.ShowAsync();
+
+            if(result == ContentDialogResult.Primary)
+            {
+                DailyReportService.UpdateItem(selectedUnit, selectedReport);
+                LoadReport(selectedUnit.ToString());
+            }
+
         }
     }
 }

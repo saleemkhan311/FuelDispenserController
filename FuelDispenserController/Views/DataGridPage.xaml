@@ -18,21 +18,22 @@
         <controls:DataGrid Grid.Row="1"  
                          AutoGenerateColumns="False"  
                          GridLinesVisibility="Horizontal"  
-                         ItemsSource="{x:Bind Reports, Mode=OneWay}"
+                         ItemsSource="{x:Bind Reports, Mode=TwoWay}"
                            AlternatingRowBackground="Black" HeadersVisibility="Column"
-                           x:Name="DatabaseTable">  
-                        
+                           x:Name="DatabaseTable"
+                           IsReadOnly="False">  
+                
             <controls:DataGrid.Resources >  
                 <SolidColorBrush x:Key="DataGridColumnHeaderBackgroundColor" Color="Transparent" />  
             </controls:DataGrid.Resources>  
             <controls:DataGrid.Columns>  
-                <controls:DataGridTextColumn Binding="{Binding Token}" Header="ٹوکن" />  
-                <controls:DataGridTextColumn Binding="{Binding OperatorName}" Header="پمپ آپریٹر" />  
-                <controls:DataGridTextColumn Binding="{Binding Quantity}" Header="مقدار" />  
-                <controls:DataGridTextColumn Binding="{Binding Rate}" Header="فی لیٹر" />  
-                <controls:DataGridTextColumn Binding="{Binding TotalAmount}" Header="کل رقم" />  
-                <controls:DataGridTextColumn Binding="{Binding Date_Time}" Header="تاریخ/وقت" />  
-                <controls:DataGridTextColumn Binding="{Binding User}" Header="یوزر" />  
+                <controls:DataGridTextColumn Binding="{Binding Token, Mode=TwoWay}" Header="ٹوکن" IsReadOnly="True" />  
+                <controls:DataGridTextColumn Binding="{Binding OperatorName}" Header="پمپ آپریٹر" IsReadOnly="False"/>
+                <controls:DataGridTextColumn Binding="{Binding Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Header="مقدار" IsReadOnly="False"/>  
+                <controls:DataGridTextColumn Binding="{Binding Rate}" Header="فی لیٹر" IsReadOnly="False" />  
+                <controls:DataGridTextColumn Binding="{Binding TotalAmount}" Header="کل رقم" IsReadOnly="False" />  
+                <controls:DataGridTextColumn Binding="{Binding Date_Time}" Header="تاریخ/وقت" IsReadOnly="True" />  
+                <controls:DataGridTextColumn Binding="{Binding User}" Header="یوزر" IsReadOnly="True" />  
             </controls:DataGrid.Columns>  
         </controls:DataGrid>  
 
@@ -46,13 +47,13 @@
                 <TabView.Resources>
                     <!-- Make selected tab more visible -->
                     <SolidColorBrush x:Key="TabViewItemHeaderBackgroundSelected" Color="#2D89EF" />
-                    <SolidColorBrush x:Key="TabViewItemHeaderForegroundSelected" Color="White" />
+                    <SolidColorBrush x:Key="TabViewItemHeaderForegroundSelected" Color="White"  />
 
                     <!-- Optional: hover background -->
                     <SolidColorBrush x:Key="TabViewItemHeaderBackgroundPointerOver" Color="#1A1A1A" />
                 </TabView.Resources>
 
-                <TabViewItem Header="Unit 1" IsClosable="False" />
+                <TabViewItem Header="Unit 1" IsClosable="False"  FontSize="29" FontWeight="Bold"/>
                 <TabViewItem Header="Unit 2" IsClosable="False" />
                 <TabViewItem Header="Unit 3" IsClosable="False" />
                 <TabViewItem Header="Unit 4" IsClosable="False" />

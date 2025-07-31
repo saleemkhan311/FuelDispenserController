@@ -19,15 +19,15 @@ public class DailyReport
     {
         get; set;
     }
-    public decimal Quantity
+    public double Quantity
     {
         get; set;
     }
-    public decimal Rate
+    public double Rate
     {
         get; set;
     }
-    public decimal TotalAmount
+    public double TotalAmount
     {
         get; set;
     }
