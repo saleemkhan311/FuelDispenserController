@@ -28,8 +28,8 @@ x86/
 [Aa][Rr][Mm]64/
 bld/
 # Ignore all bin folders
-[Bb]in/*
-# Allow ClickOnce publish folder inside bin
+[Bb]in/
+# Allow bin and its publish folder
 !bin/
 !bin/publish/
 !bin/publish/**
