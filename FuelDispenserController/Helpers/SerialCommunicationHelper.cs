@@ -1,0 +1,276 @@
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO.Ports;
+using System.Runtime.Serialization.Formatters;
+using System.Threading;       // For CancellationTokenSource
+using System.Threading.Tasks; // For Task and async/await
+using CommunityToolkit.WinUI;
+using FuelDispenserController.Models;
+using FuelDispenserController.Services;
+using FuelDispenserController.ViewModels;
+using Microsoft.Data.Sqlite;
+using Microsoft.UI.Dispatching; // For DispatcherQueue to update UI
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
+using SQLite;
+using Windows.Devices.Enumeration;
+using Windows.Devices.SerialCommunication;
+using Windows.Storage.Streams; // For DataReader
+
+
+
+
+namespace FuelDispenserController.Helpers;
+public class SerialCommunicationHelper : IDisposable
+{
+
+    // --- Private Variables (Internal tools for this manager) ---
+    private string _comPortName; // Stores the name of the COM port (like "COM3") for this ESP32
+    private uint _baudRate;      // Stores the speed (baud rate) for communication (like 115200)
+
+    // These variables hold references to the actual button and text box on your app's screen
+    // that belong to THIS specific ESP32.
+    private Button _controlButton;   // The button that sends commands for this ESP32 unit
+    private TextBlock _statusTextBlock; // The text box that shows status messages for this ESP32 unit
+
+    // These are the core tools for talking to the serial port.
+    private SerialDevice _serialPort; // Represents the physical serial connection
+    private DataWriter _dataWriter;   // Helps us write (send) data to the serial port
+    private CancellationTokenSource _readCancellationTokenSource; // Helps us stop the background reading gracefully
+
+    // This keeps track of whether we are successfully connected to this ESP32.
+    public bool IsConnected { get; private set; } = false;
+
+    // --- Constructor (What happens when you "create" a new ESP32 Manager) ---
+    // When you make a new manager, you tell it:
+    // - Which COM port it's in charge of
+    // - What speed to talk at
+    // - Which button on the screen it controls
+    // - Which text box on the screen it updates
+
+    private DispatcherQueue _dispatcherQueue;
+
+    public SerialCommunicationHelper(string comPortName, uint baudRate, Button controlButton, TextBlock statusTextBlock, DispatcherQueue dispatcherQueue)
+    {
+        _comPortName = comPortName;
+        _baudRate = baudRate;
+        _controlButton = controlButton;
+        _statusTextBlock = statusTextBlock;
+
+        _controlButton.IsEnabled = false; // By default, the button is off (disabled) until connected
+        _statusTextBlock.Text = $"Controller for {_comPortName} setup ready."; // Show initial status
+        _dispatcherQueue = dispatcherQueue; // Save the dispatcher queue to use later for UI updates
+
+    }
+
+    // --- Public Methods (Actions this manager can perform) ---
+
+    // This function tries to connect to the ESP32. It runs in the background ("async Task").
+    public async Task ConnectAsync()
+    {
+        _statusTextBlock.Text = $"Trying to connect to {_comPortName} at {_baudRate} speed...";
+        _controlButton.IsEnabled = false; // Keep button disabled while trying to connect
+
+        try
+        {
+            // First, we ask Windows to find all serial devices connected.
+            string searchFilter = SerialDevice.GetDeviceSelector(); // This gets a special text string for searching
+            var foundDevices = await DeviceInformation.FindAllAsync(searchFilter); // This finds the devices
+
+            if (foundDevices.Any()) // If we found ANY devices...
+            {
+                // Try to find OUR specific ESP32 among the found devices.
+                // We check if the device's name or its unique ID contains our COM port name (e.g., "COM3").
+                var ourTargetDevice = foundDevices.FirstOrDefault(d =>
+                    d.Name.Contains(_comPortName, StringComparison.OrdinalIgnoreCase) ||
+                    d.Id.Contains(_comPortName, StringComparison.OrdinalIgnoreCase));
+
+                if (ourTargetDevice != null) // If we found our specific device...
+                {
+                    // Try to open the connection to that device.
+                    _serialPort = await SerialDevice.FromIdAsync(ourTargetDevice.Id);
+
+                    if (_serialPort != null) // If the connection opened successfully...
+                    {
+                        // --- CONFIGURE THE SERIAL PORT SETTINGS ---
+                        // These MUST match the settings in your ESP32 Arduino code!
+                        _serialPort.BaudRate = _baudRate;      // Communication speed
+                        _serialPort.DataBits = 8;              // Number of data bits per character
+                        _serialPort.StopBits = SerialStopBitCount.One; // How many stop bits
+                        _serialPort.Parity = SerialParity.None;     // Error checking (none)
+                        _serialPort.Handshake = SerialHandshake.None; // Flow control (none)
+                        _serialPort.ReadTimeout = TimeSpan.FromMilliseconds(1000); // Max time to wait for reading
+                        _serialPort.WriteTimeout = TimeSpan.FromMilliseconds(1000); // Max time to wait for writing
+
+                        _dataWriter = new DataWriter(_serialPort.OutputStream); // Prepare to send data
+                        IsConnected = true; // Mark as connected!
+
+                        _statusTextBlock.Text = $"CONNECTED to {_serialPort.PortName} ({ourTargetDevice.Name})."; // Update status text
+                        _controlButton.IsEnabled = true; // Enable the button now that we're connected
+
+                        ListenForSerialData(); // Start listening for messages from the ESP32 in the background!
+                    }
+                    else // If we couldn't open the serial port (maybe another app is using it)
+                    {
+                        _statusTextBlock.Text = $"FAILED to open {_comPortName}. Is it already in use?";
+                        IsConnected = false;
+                        _controlButton.IsEnabled = false;
+                    }
+                }
+                else // If we found devices, but not our specific COM port
+                {
+                    string allFoundNames = string.Join(", ", foundDevices.Select(d => d.Name));
+                    _statusTextBlock.Text = $"Could not find '{_comPortName}'. Found these: {allFoundNames}.";
+                    IsConnected = false;
+                    _controlButton.IsEnabled = false;
+                }
+            }
+            else // If no serial devices were found at all
+            {
+                _statusTextBlock.Text = "No serial devices found. Is your ESP32 plugged in and drivers installed?";
+                IsConnected = false;
+                _controlButton.IsEnabled = false;
+            }
+        }
+        catch (Exception ex) // If any other error happens during connection
+        {
+            _statusTextBlock.Text = $"Error connecting to {_comPortName}: {ex.Message}";
+            IsConnected = false;
+            _controlButton.IsEnabled = false;
+        }
+    }
+
+    // This function sends a command (like "ON") to the ESP32.
+    public async Task SendCommandAsync(string command)
+    {
+        if (_serialPort != null && _dataWriter != null && IsConnected) // Check if we are actually connected
+        {
+            try
+            {
+                _dataWriter.WriteString(command); // Put the command into the sender
+                await _dataWriter.StoreAsync();   // Send the command over the wire!
+
+                _statusTextBlock.Text = $"Sent: '{command.Trim()}' to {_comPortName}. Waiting for response...";
+                _controlButton.IsEnabled = false; // Disable button after sending, waiting for ESP32 response
+            }
+            catch (Exception ex) // If sending fails
+            {
+                _statusTextBlock.Text = $"Error sending to {_comPortName}: {ex.Message}";
+                IsConnected = false; // Assume connection is lost
+                _controlButton.IsEnabled = false;
+                await ConnectAsync(); // Try to reconnect automatically
+            }
+        }
+        else // If we are not connected
+        {
+            _statusTextBlock.Text = $"Not connected to {_comPortName}. Trying to reconnect...";
+            _controlButton.IsEnabled = false;
+            await ConnectAsync(); // Try to reconnect
+        }
+    }
+
+    // This function runs in the background and constantly listens for messages from the ESP32.
+    private async void ListenForSerialData()
+    {
+        // If there was a previous listener, stop it and clean it up.
+        _readCancellationTokenSource?.Cancel(); // Tell the old one to stop
+        _readCancellationTokenSource?.Dispose(); // Clean up old one
+        _readCancellationTokenSource = new CancellationTokenSource(); // Create a brand new one
+
+        DataReader dataReader = new DataReader(_serialPort.InputStream); // Prepare to read data
+
+        while (true) // This loop will run forever until we tell it to stop
+        {
+            try
+            {
+                // Check if someone (like the app closing) told us to stop.
+                _readCancellationTokenSource.Token.ThrowIfCancellationRequested();
+
+                // Try to read some bytes from the serial port.
+                // This will wait here until data arrives or the task is cancelled.
+                uint bytesRead = await dataReader.LoadAsync(1024).AsTask(_readCancellationTokenSource.Token);
+
+                if (bytesRead > 0) // If we actually received some data...
+                {
+                    string receivedText = dataReader.ReadString(bytesRead); // Convert the bytes to text
+
+                    // IMPORTANT: Update the display (UI) safely.
+                    // You MUST do UI updates on the main "UI thread". This line helps.
+                    await _dispatcherQueue.EnqueueAsync(() =>
+                    {
+                        // Now we check what the ESP32 sent us.
+                        if (receivedText.Contains("OFF", StringComparison.OrdinalIgnoreCase))
+                        {
+                            _statusTextBlock.Text = $"ESP32 {_comPortName}: RELAY is OFF.";
+                            _controlButton.IsEnabled = true; // Enable the button again, because the relay is off
+                        }
+                        else if (receivedText.Contains("ON", StringComparison.OrdinalIgnoreCase))
+                        {
+                            _statusTextBlock.Text = $"ESP32 {_comPortName}: RELAY is ON.";
+                            _controlButton.IsEnabled = false; // Disable button as it's already ON
+                        }
+                        else
+                        {
+                            // If it's something else, just show what we got.
+                            _statusTextBlock.Text = $"ESP32 {_comPortName}: Received: '{receivedText.Trim()}'";
+                        }
+                    });
+                }
+                // A small pause to prevent the app from using too much power by checking too fast.
+                await Task.Delay(50);
+            }
+            catch (OperationCanceledException)
+            {
+                // This error means we were told to stop listening, which is normal when closing.
+                await _dispatcherQueue.EnqueueAsync(() =>
+                {
+                    _statusTextBlock.Text = $"Listening stopped for {_comPortName}.";
+                });
+                break; // Exit the endless loop
+            }
+            catch (Exception ex) // If any other unexpected error happens while listening
+            {
+                await _dispatcherQueue.EnqueueAsync(() =>
+                {
+                    _statusTextBlock.Text = $"Error listening to {_comPortName}: {ex.Message}";
+                });
+                IsConnected = false; // Mark as disconnected
+                _controlButton.IsEnabled = false; // Disable the button
+                break; // Exit the endless loop on error
+            }
+        }
+
+        // After the loop stops, clean up the reader.
+        dataReader.Dispose();
+    }
+
+    // --- Cleanup (What happens when this manager is no longer needed) ---
+    // This is important to release the serial port so other apps can use it.
+    public void Dispose()
+    {
+        // First, tell the background listener to stop.
+        _readCancellationTokenSource?.Cancel();
+        _readCancellationTokenSource?.Dispose();
+        _readCancellationTokenSource = null;
+
+        // Clean up the data sender.
+        if (_dataWriter != null)
+        {
+            _dataWriter.DetachStream(); // Detach it from the port first
+            _dataWriter.Dispose();      // Then properly close it
+            _dataWriter = null;
+        }
+        // Clean up the serial port connection itself.
+        if (_serialPort != null)
+        {
+            _serialPort.Dispose();
+            _serialPort = null;
+        }
+        IsConnected = false;
+        _statusTextBlock.Text = $"Controller for {_comPortName} cleaned up.";
+        _controlButton.IsEnabled = false; // Ensure button is disabled
+    }
+
+}

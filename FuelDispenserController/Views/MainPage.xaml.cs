@@ -6,6 +6,7 @@ using System.Runtime.Serialization.Formatters;
 using System.Threading;       // For CancellationTokenSource
 using System.Threading.Tasks; // For Task and async/await
 using CommunityToolkit.WinUI;
+using FuelDispenserController.Helpers;
 using FuelDispenserController.Models;
 using FuelDispenserController.Services;
 using FuelDispenserController.ViewModels;
@@ -35,6 +36,8 @@ public sealed partial class MainPage : Page
 
     public MainPage()
     {
+        _espControllers = new List<SerialCommunicationHelper>();
+
         DatabaseHelper.InitializeDatabase();
         ViewModel = App.GetService<MainViewModel>();
         InitializeComponent();
@@ -45,8 +48,12 @@ public sealed partial class MainPage : Page
         SetBaseToken(TokenTextBox4, "4");
 
         DatabaseHelper.InitializeDatabase();
+
+        _espControllers.Add(new SerialCommunicationHelper("COM3", 115200, UnitOnButton1, StatusTextBlock, this.DispatcherQueue));
+
+        ConnectAllControllers();
         //InitSerialPort("COM3");
-        ConnectToSerialPort();
+
 
     }
 
@@ -56,177 +63,26 @@ public sealed partial class MainPage : Page
     private double rate;
     private double totalAmount;
 
+    private List<SerialCommunicationHelper> _espControllers;
 
-   
-    private CancellationTokenSource _readCancellationTokenSource;
-    public ObservableCollection<string> AvailableComPorts { get; } = new ObservableCollection<string>();
-    private SerialDevice _serialPort;
-    private DataWriter _dataWriter;
 
-    // Define your known COM port and baud rate here
-    private const string TARGET_COM_PORT_NAME = "COM3"; // <<< CHANGE THIS IF YOUR PORT IS DIFFERENT
-    private const uint BAUD_RATE = 115200;
-    private async void ConnectToSerialPort()
+    private async void ConnectAllControllers()
     {
-        StatusTextBlock.Text = $"Attempting to connect to {TARGET_COM_PORT_NAME} at {BAUD_RATE} baud...";
-
-        try
+        //GeneralAppStatus.Text = "Starting connection for all ESP32 units...";
+        foreach (var controller in _espControllers) // Go through each manager in our list
         {
-            string aqs = SerialDevice.GetDeviceSelector(); // Get selector for ALL serial devices
-            var devices = await Windows.Devices.Enumeration.DeviceInformation.FindAllAsync(aqs);
-
-            if (devices.Any())
-            {
-                // Find the device where the name or Id contains the target COM port name
-                var targetDevice = devices.FirstOrDefault(d => d.Name.Contains(TARGET_COM_PORT_NAME, StringComparison.OrdinalIgnoreCase) ||
-                                                               d.Id.Contains(TARGET_COM_PORT_NAME, StringComparison.OrdinalIgnoreCase));
-
-                if (targetDevice != null)
-                {
-                    _serialPort = await SerialDevice.FromIdAsync(targetDevice.Id);
-
-                    if (_serialPort != null)
-                    {
-                        // ... (rest of your configuration code remains the same) ...
-                        _serialPort.BaudRate = BAUD_RATE;
-                        _serialPort.DataBits = 8;
-                        _serialPort.StopBits = SerialStopBitCount.One;
-                        _serialPort.Parity = SerialParity.None;
-                        _serialPort.Handshake = SerialHandshake.None;
-                        _serialPort.ReadTimeout = TimeSpan.FromMilliseconds(1000);
-                        _serialPort.WriteTimeout = TimeSpan.FromMilliseconds(1000);
-
-                        _dataWriter = new DataWriter(_serialPort.OutputStream);
-
-                        StatusTextBlock.Text = $"Successfully connected to {_serialPort.PortName} ({targetDevice.Name})."; // Show actual port name
-                        UnitOnButton1.IsEnabled = true;
-                        ListenForSerialData();
-                    }
-                    else
-                    {
-                        StatusTextBlock.Text = $"Could not open {TARGET_COM_PORT_NAME}. It might be in use or not accessible.";
-                        UnitOnButton1.IsEnabled = false;
-                    }
-                }
-                else
-                {
-                    // This block will now tell you what names were actually found
-                    string foundNames = string.Join(", ", devices.Select(d => d.Name));
-                    StatusTextBlock.Text = $"No device found matching '{TARGET_COM_PORT_NAME}'. Found devices: {foundNames}.";
-                    UnitOnButton1.IsEnabled = false;
-                }
-            }
-            else
-            {
-                StatusTextBlock.Text = "No serial devices found at all. Check connections and drivers.";
-                UnitOnButton1.IsEnabled = false;
-            }
+            await controller.ConnectAsync(); // Tell each manager to connect to its ESP32
         }
-        catch (Exception ex)
-        {
-            StatusTextBlock.Text = $"Error connecting to serial port: {ex.Message}";
-            UnitOnButton1.IsEnabled = false;
-        }
+        //GeneralAppStatus.Text = "All connection attempts finished.";
     }
+
 
     private async void UnitControl_Click1(object sender, RoutedEventArgs e)
     {
-        if (_serialPort != null && _dataWriter != null)
-        {
-            try
-            {
-                string command = "ON\n"; // Send "ON" followed by a newline character
-                _dataWriter.WriteString(command);
-                await _dataWriter.StoreAsync(); // Ensure data is sent
-
-                StatusTextBlock.Text = $"Sent: '{command.Trim()}' to {TARGET_COM_PORT_NAME}";
-                UnitOnButton1.IsEnabled = false;
-            }
-            catch (Exception ex)
-            {
-                StatusTextBlock.Text = $"Error sending command: {ex.Message}";
-            }
-        }
-        else
-        {
-            StatusTextBlock.Text = "Serial port not connected. Attempting to reconnect...";
-            UnitOnButton1.IsEnabled = false; // Disable temporarily
-            ConnectToSerialPort(); // Try to reconnect
-        }
+        await _espControllers[0].SendCommandAsync("ON\n");
     }
 
 
-    private async void ListenForSerialData()
-    {
-        // Ensure any previous read operation is cancelled before starting a new one
-        _readCancellationTokenSource?.Cancel();
-        _readCancellationTokenSource?.Dispose();
-        _readCancellationTokenSource = new CancellationTokenSource();
-
-        DataReader dataReader = new DataReader(_serialPort.InputStream);
-
-        while (true) // Continuous loop to read data
-        {
-            try
-            {
-                // Check if cancellation has been requested
-                _readCancellationTokenSource.Token.ThrowIfCancellationRequested();
-
-                // Try to load more bytes into the buffer.
-                // LoadAsync returns the number of bytes read.
-                // We use a small buffer size (e.g., 1024) or just 1 byte to check for new data.
-                uint bytesToRead = await dataReader.LoadAsync(1024).AsTask(_readCancellationTokenSource.Token);
-
-                if (bytesToRead > 0)
-                {
-                    // Read the string from the buffer
-                    string receivedText = dataReader.ReadString(bytesToRead);
-
-                    // Update the UI on the UI thread using DispatcherQueue
-                    // This is crucial because you cannot directly update UI from a background thread
-                    await DispatcherQueue.EnqueueAsync(() =>
-                    {
-                        // You can parse the receivedText here based on your ESP32's output
-                        // For example, if ESP32 sends "OFF" when LED is turned off by touch:
-                        if (receivedText.Contains("OFF", StringComparison.OrdinalIgnoreCase))
-                        {
-                            StatusTextBlock.Text = $"Received from ESP32: RELAY is OFF.";
-                            // You could potentially disable the "ON" button here, or enable an "OFF" button
-                            UnitOnButton1.IsEnabled = true;
-                        }
-                        else
-                        {
-                            StatusTextBlock.Text = $"Received: RELAY {receivedText.Trim()}";
-                        }
-                    });
-                }
-                // Add a small delay to prevent busy-waiting and consuming too much CPU
-                await Task.Delay(50);
-            }
-            catch (OperationCanceledException)
-            {
-                // This exception is thrown when _readCancellationTokenSource.Cancel() is called.
-                // It means the reading task was intentionally stopped.
-                await DispatcherQueue.EnqueueAsync(() =>
-                {
-                    StatusTextBlock.Text = "Serial port listening stopped.";
-                });
-                break; // Exit the loop
-            }
-            catch (Exception ex)
-            {
-                // Handle other exceptions, e.g., serial port disconnected unexpectedly
-                await DispatcherQueue.EnqueueAsync(() =>
-                {
-                    StatusTextBlock.Text = $"Error during serial read: {ex.Message}";
-                });
-                break; // Exit the loop on error
-            }
-        }
-
-        // Clean up DataReader when the loop exits
-        dataReader.Dispose();
-    }
     void AddReport(string UnitNo)
     {
         var report = new DailyReport
