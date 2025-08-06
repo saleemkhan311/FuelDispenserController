@@ -32,7 +32,8 @@ bld/
 # Allow ClickOnce publish folder inside bin
 !bin/
 !bin/publish/
-!bin/publish/**[Oo]bj/
+!bin/publish/**
+[Oo]bj/
 [Ll]og/
 [Ll]ogs/
 
