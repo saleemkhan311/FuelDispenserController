@@ -8,9 +8,9 @@
     mc:Ignorable="d">
 
     <Grid x:Name="ContentArea" >
-
+        <TextBlock Text="Version 1.0.0.0" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center"  />
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-
+    
             <Grid MaxWidth="1370">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
