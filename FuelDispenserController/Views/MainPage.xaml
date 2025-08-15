@@ -8,7 +8,7 @@
     mc:Ignorable="d">
 
     <Grid x:Name="ContentArea" >
-        <TextBlock Text="Version 1.0.0.0" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center"  />
+        
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
     
             <Grid MaxWidth="1370">
@@ -46,10 +46,13 @@
 
                     <!-- Buttons -->
                     <StackPanel Orientation="Vertical" Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="5">
-                        <Button Content="Capture"  Background="#0078D7" Foreground="White" Width="200"/>
-                        <Button Content="Print"  Background="#0078D7" Foreground="White" Width="200" Click="PrintButton_Click" />
-                        <Button x:Name="UnitOnButton1" Content="Unit On"  Background="#0078D7" Foreground="White" Width="200" Click="UnitControl_Click1" />
+                        <Button Content="Capture"  Background="#0078D7" Foreground="White" Width="195"/>
+                        <Button Name="PrintButton" Content="Print"  Background="#0078D7" Foreground="White" Width="195" Click="PrintButton_Click" />
+
+                        <Button x:Name="UnitOnButton1" Content="Unit On"  Background="#0078D7" Foreground="White" Width="195" Click="UnitControl_Click1" />
                         <TextBlock Name="StatusTextBlock" Text="Unit Status: " FontSize="18"  Margin="0,2,0,0" TextWrapping="Wrap"/>
+
+                        
                     </StackPanel>
 
 
@@ -86,7 +89,10 @@
                     <StackPanel Orientation="Vertical" Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="5">
                         <Button Content="Capture"  Background="#0078D7" Foreground="White" Width="200"/>
                         <Button Content="Print"  Background="#0078D7" Foreground="White" Width="200" Click="PrintButton_Click2" />
-                        <Button Content="Unit On"  Background="#0078D7" Foreground="White" Width="200" />
+                        
+
+                        <Button x:Name="UnitOnButton2" Content="Unit On"  Background="#0078D7" Foreground="White" Width="195" Click="UnitControl_Click2" />
+                        <TextBlock Name="StatusTextBlock2" Text="Unit Status: " FontSize="18"  Margin="0,2,0,0" TextWrapping="Wrap"/>
                     </StackPanel>
 
 

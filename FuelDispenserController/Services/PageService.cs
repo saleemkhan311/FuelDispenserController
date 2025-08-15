@@ -19,6 +19,8 @@ public class PageService : IPageService
         Configure<ContentGridDetailViewModel, ContentGridDetailPage>();
         Configure<DataGridViewModel, DataGridPage>();
         Configure<ListDetailsViewModel, ListDetailsPage>();
+        
+        
     }
 
     public Type GetPageType(string key)

@@ -6,7 +6,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-
+using CommunityToolkit.Mvvm.ComponentModel;
 using Windows.System;
 
 namespace FuelDispenserController.Views;
@@ -14,6 +14,7 @@ namespace FuelDispenserController.Views;
 // TODO: Update NavigationViewItem titles and icons in ShellPage.xaml.
 public sealed partial class ShellPage : Page
 {
+    
     public ShellViewModel ViewModel
     {
         get;

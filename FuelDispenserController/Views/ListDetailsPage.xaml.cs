@@ -12,12 +12,17 @@ namespace FuelDispenserController.Views;
 
 public sealed partial class ListDetailsPage : Page
 {
-    readonly string UserDatabase = "Data Source=C:\\Database\\FuelDispenserManagement.db;";
+    private static readonly string DbFolder = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "FuelDispenserController");
+    private static readonly string DbPath = Path.Combine(DbFolder, "FuelDispenserManagement.db");
+    private static readonly string ConnectionString = $"Data Source={DbPath}";
+
     public ListDetailsPage()
     {
 
         InitializeComponent();
-        DatabaseHelper.InitializeUserDatabase(UserDatabase);
+       
     }
 
 
@@ -73,11 +78,11 @@ public sealed partial class ListDetailsPage : Page
 
             };
 
-            if (UsernameExists(username, UserDatabase))
+            if (UsernameExists(username, ConnectionString))
             {
 
             }
-            else { UserService.AddUser(UserDatabase, newUser); LoadUsers(); }
+            else { UserService.AddUser(ConnectionString, newUser); LoadUsers(); }
                 
 
             FormMessage.Text = "User Registered Successfully!";
@@ -99,7 +104,7 @@ public sealed partial class ListDetailsPage : Page
 
     private void LoadUsers()
     {
-        var dbPath = UserDatabase; // or relative path
+        var dbPath = ConnectionString; // or relative path
         var users = UserService.GetAllUsers(dbPath);
         UserListView.ItemsSource = users;
     }
@@ -133,7 +138,7 @@ public sealed partial class ListDetailsPage : Page
         _selectedUser.Username = UsernameTextBox.Text;
         _selectedUser.Password = PasswordBox.Password;
 
-        UserService.UpdateUser(_selectedUser, UserDatabase);
+        UserService.UpdateUser(_selectedUser, ConnectionString);
 
         // Refresh list or show success message
 
@@ -179,7 +184,7 @@ public sealed partial class ListDetailsPage : Page
             {
                 // Remove from database
               
-                    UserService.DeleteUser(userToDelete.Id, UserDatabase);
+                    UserService.DeleteUser(userToDelete.Id, ConnectionString);
                     LoadUsers();
                     FormMessage.Text = "User Deleted Successfully!";
                     FormMessage.Foreground = new SolidColorBrush(Colors.LightBlue);

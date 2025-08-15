@@ -24,12 +24,18 @@ namespace FuelDispenserController.Views;
 
 public sealed partial class MainPage : Page
 {
+   
+
     public MainViewModel ViewModel
     {
         get;
     }
 
-    static readonly string connectionString = "Data Source=C:\\Database\\FuelDispenserManagement.db;";
+    private static readonly string DbFolder = Path.Combine(
+         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+         "FuelDispenserController");
+    private static readonly string DbPath = Path.Combine(DbFolder, "FuelDispenserManagement.db");
+    private static readonly string ConnectionString = $"Data Source={DbPath}";
     public ObservableCollection<DailyReport> Reports { get; set; } = new();
 
     
@@ -49,11 +55,13 @@ public sealed partial class MainPage : Page
 
         DatabaseHelper.InitializeDatabase();
 
-        _espControllers.Add(new SerialCommunicationHelper("COM3", 115200, UnitOnButton1, StatusTextBlock, this.DispatcherQueue));
+         _espControllers.Add(new SerialCommunicationHelper("COM4", 115200, UnitOnButton1, StatusTextBlock, this.DispatcherQueue));
+         _espControllers.Add(new SerialCommunicationHelper("COM3", 115200, UnitOnButton2, StatusTextBlock2, this.DispatcherQueue));
 
         ConnectAllControllers();
         //InitSerialPort("COM3");
-
+        //ComPortBox.Text = "COM4"; // Replace with your default COM port
+        //BaudRateBox.Text = "115200"; // Replace with your default baud rate
 
     }
 
@@ -76,15 +84,63 @@ public sealed partial class MainPage : Page
         //GeneralAppStatus.Text = "All connection attempts finished.";
     }
 
+    // Event handler for when the "Connect & Send ON" button is clicked.
+    //private SerialCommunicationHelper? _espControllers;
+    //private async void UnitControl_Click1(object sender, RoutedEventArgs e)
+    //{
+    //    // Read the user input from the text boxes.
+    //    string comPortName = ComPortBox.Text.Trim();
+    //    string baudRateText = BaudRateBox.Text.Trim();
+
+    //    // Perform basic validation on the user input.
+    //    if (string.IsNullOrEmpty(comPortName) || string.IsNullOrEmpty(baudRateText))
+    //    {
+    //        StatusTextBlock.Text = "Error: Please enter both a COM port and a baud rate.";
+    //        return;
+    //    }
+
+    //    // Try to convert the baud rate text into a number.
+    //    if (!uint.TryParse(baudRateText, out uint baudRate))
+    //    {
+    //        StatusTextBlock.Text = "Error: Baud rate must be a valid number.";
+    //        return;
+    //    }
+
+    //    // If a controller already exists, we need to clean it up before creating a new one.
+    //    if (_espControllers != null)
+    //    {
+    //        _espControllers.Dispose();
+    //        _espControllers = null;
+    //    }
+
+    //    // Create a new controller with the user's input.
+    //    // We pass the new status text block and the current window's dispatcher queue.
+    //    _espControllers = new SerialCommunicationHelper(comPortName, baudRate, PrintButton, StatusTextBlock, this.DispatcherQueue);
+
+    //    // Connect to the ESP32 and wait for the connection to be established.
+    //    await _espControllers.ConnectAsync();
+    //    // After connecting, if the connection was successful, send the "ON" command.
+    //    if (_espControllers.IsConnected)
+    //    {
+    //        await _espControllers.SendCommandAsync("ON\n");
+    //    }
+    //}
 
     private async void UnitControl_Click1(object sender, RoutedEventArgs e)
     {
         await _espControllers[0].SendCommandAsync("ON\n");
     }
+    private async void UnitControl_Click2(object sender, RoutedEventArgs e)
+    {
+        await _espControllers[1].SendCommandAsync("ON\n");
+    }
 
 
     void AddReport(string UnitNo)
     {
+       
+
+
         var report = new DailyReport
         {
             Token = token,
@@ -92,7 +148,8 @@ public sealed partial class MainPage : Page
             Quantity = quantity,
             Rate = rate,
             TotalAmount = totalAmount,
-            Date_Time = DateTime.Now
+            Date_Time = DateTime.Now,
+            User = App.CurrentUserName
 
         };
 
@@ -152,7 +209,7 @@ public sealed partial class MainPage : Page
     {
         string lastToken = null;
 
-        using var connection = new Microsoft.Data.Sqlite.SqliteConnection($"{connectionString}");
+        using var connection = new Microsoft.Data.Sqlite.SqliteConnection($"{ConnectionString}");
         connection.Open();
 
         using var cmd = connection.CreateCommand();

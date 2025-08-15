@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using FuelDispenserController.Models;
+using FuelDispenserController.Services;
 using FuelDispenserController.ViewModels;
+using Microsoft.Data.Sqlite;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.Data.Sqlite;
-using FuelDispenserController.Services;
 
 namespace FuelDispenserController.Views;
 
@@ -13,12 +14,16 @@ namespace FuelDispenserController.Views;
 // For more details, see the documentation at https://docs.microsoft.com/windows/communitytoolkit/controls/datagrid.
 public sealed partial class DataGridPage : Page
 {
-    private const string DatabaseFilePath = "Data Source=C:\\Database\\FuelDispenserManagement.db;";
+    private static readonly string DbFolder = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "FuelDispenserController");
+    private static readonly string DbPath = Path.Combine(DbFolder, "FuelDispenserManagement.db");
+    private static readonly string ConnectionString = $"Data Source={DbPath}";
 
-    public ObservableCollection<DailyReport> ReportsUnit1 { get; set; } = new();
-    public ObservableCollection<DailyReport> ReportsUnit2 { get; set; } = new();
-    public ObservableCollection<DailyReport> ReportsUnit3 { get; set; } = new();
-    public ObservableCollection<DailyReport> ReportsUnit4 { get; set; } = new();
+    //public ObservableCollection<DailyReport> ReportsUnit1 { get; set; } = new();
+    //public ObservableCollection<DailyReport> ReportsUnit2 { get; set; } = new();
+    //public ObservableCollection<DailyReport> ReportsUnit3 { get; set; } = new();
+    //public ObservableCollection<DailyReport> ReportsUnit4 { get; set; } = new();
     public ObservableCollection<DailyReport> Reports { get; set; } = new();
 
 
@@ -30,18 +35,60 @@ public sealed partial class DataGridPage : Page
         UnitOptions = new List<string> { "Unit 1", "Unit 2", "Unit 3", "Unit 4" };
     }
 
-  
+
+
+    private string CurrentUserType()
+    {
+        string currentUserName = App.CurrentUserName;
+        string currentUserType = " ";
+
+        using var connection = new Microsoft.Data.Sqlite.SqliteConnection(ConnectionString);
+        connection.Open();
+
+        string query = "SELECT UserType FROM Users WHERE Username = @Username";
+
+        using var cmd = new Microsoft.Data.Sqlite.SqliteCommand(query,connection);
+        cmd.Parameters.AddWithValue("@Username", currentUserName);
+        using var reader = cmd.ExecuteReader();
+
+        if (reader.Read())
+        {
+            currentUserType = reader.GetString(0);
+        }
+        else
+        {
+            // Handle case where user is not found
+            currentUserType = "Unknown";
+        }
+
+
+        return currentUserType;
+    }
 
     private void LoadReport(string unitNo)
     {
+        
+        string currentUserType = CurrentUserType();
+        string currentUserName = App.CurrentUserName;
+
+
         Reports.Clear();
 
-        using var connection = new Microsoft.Data.Sqlite.SqliteConnection(DatabaseFilePath);
+        using var connection = new Microsoft.Data.Sqlite.SqliteConnection(ConnectionString);
         connection.Open();
 
         using var cmd = connection.CreateCommand();
 
-        cmd.CommandText = $"SELECT * FROM DailyReport_Unit_{unitNo}";
+        if(currentUserType == "Admin")
+        {
+            cmd.CommandText = $"SELECT * FROM DailyReport_Unit_{unitNo} ";
+        }else if(currentUserType == "Manager") 
+        { 
+            cmd.CommandText = $"SELECT * FROM DailyReport_Unit_{unitNo} WHERE User = @Username "; 
+            cmd.Parameters.AddWithValue("@Username", currentUserName);
+
+        }
+
 
         using var reader = cmd.ExecuteReader();
         while (reader.Read())
@@ -53,7 +100,11 @@ public sealed partial class DataGridPage : Page
                 Quantity = double.Parse(reader.GetString(2)),
                 Rate = double.Parse(reader.GetString(3)),
                 TotalAmount = double.Parse(reader.GetString(4)),
-                Date_Time = DateTime.Parse(reader.GetString(5)),
+                //Date_Time = DateTime.Parse(reader.GetString(5)),
+
+                Date_Time = DateTime.ParseExact(reader.GetString(5), "dd-MM-yyyy HH:mm:ss", CultureInfo.InvariantCulture),
+                //Date_Time = DateTime.TryParse(reader.GetString(5), out DateTime dateTime) ? dateTime : DateTime.MinValue,
+
                 User = reader.IsDBNull(6) ? "none" : reader.GetString(6)
             });
         }

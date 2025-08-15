@@ -8,6 +8,13 @@ namespace FuelDispenserController;
 
 public static class UserService
 {
+
+    private static readonly string DbFolder = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "FuelDispenserController");
+    private static readonly string DbPath = Path.Combine(DbFolder, "FuelDispenserManagement.db");
+    private static readonly string ConnectionString = $"Data Source={DbPath}";
+
     public static void AddUser(string dbPath, User user)
     {
 
@@ -18,7 +25,7 @@ public static class UserService
             throw new ArgumentException("All fields (Username, Password, UserType) must be provided.");
         }
 
-        using var connection = new Microsoft.Data.Sqlite.SqliteConnection(dbPath);
+        using var connection = new Microsoft.Data.Sqlite.SqliteConnection(ConnectionString);
         connection.Open();
 
         var insertCmd = connection.CreateCommand();

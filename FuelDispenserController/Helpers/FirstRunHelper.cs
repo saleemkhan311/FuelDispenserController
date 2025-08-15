@@ -5,11 +5,8 @@ namespace FuelDispenserController.Core.Helpers;
 
 public static class FirstRunHelper
 {
-    private static readonly string AppFolder = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "FuelDispenserController");
-
-    private static readonly string FirstRunFlagPath = Path.Combine(AppFolder, "first_run.flag");
+    private static readonly string DbFolder = @"C:\Database"; // database folder
+    private static readonly string FirstRunFlagPath = Path.Combine(DbFolder, "first_run.flag");
 
     public static bool IsFirstRun()
     {
@@ -18,7 +15,8 @@ public static class FirstRunHelper
 
     public static void MarkFirstRunComplete()
     {
-        Directory.CreateDirectory(AppFolder); // ensure folder exists
+       
+        Directory.CreateDirectory(DbFolder); // make sure the folder exists
         File.WriteAllText(FirstRunFlagPath, "Initialized");
     }
 }

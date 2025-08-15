@@ -1,6 +1,8 @@
-﻿using FuelDispenserController.Activation;
+﻿using System.Diagnostics;
+using FuelDispenserController.Activation;
 using FuelDispenserController.Contracts.Services;
 using FuelDispenserController.Core.Contracts.Services;
+using FuelDispenserController.Core.Helpers;
 using FuelDispenserController.Core.Services;
 using FuelDispenserController.Helpers;
 using FuelDispenserController.Models;
@@ -23,6 +25,9 @@ public partial class App : Application
     // https://docs.microsoft.com/dotnet/core/extensions/dependency-injection
     // https://docs.microsoft.com/dotnet/core/extensions/configuration
     // https://docs.microsoft.com/dotnet/core/extensions/logging
+
+   
+
     public IHost Host
     {
         get;
@@ -40,7 +45,10 @@ public partial class App : Application
     }
 
     public static WindowEx MainWindow { get; } = new MainWindow();
-
+    public static string CurrentUserName
+    {
+        get; set;
+    }
     public static UIElement? AppTitlebar { get; set; }
 
     public App()
@@ -73,6 +81,7 @@ public partial class App : Application
             services.AddSingleton<IFileService, FileService>();
 
             // Views and ViewModels
+            
             services.AddTransient<ListDetailsViewModel>();
             services.AddTransient<ListDetailsPage>();
             services.AddTransient<DataGridViewModel>();
@@ -106,8 +115,17 @@ public partial class App : Application
     {
         base.OnLaunched(args);
 
-        App.GetService<IAppNotificationService>().Show(string.Format("AppNotificationSamplePayload".GetLocalized(), AppContext.BaseDirectory));
+        //App.GetService<IAppNotificationService>().Show(string.Format("AppNotificationSamplePayload".GetLocalized(), AppContext.BaseDirectory));
 
-        await App.GetService<IActivationService>().ActivateAsync(args);
+        //await App.GetService<IActivationService>().ActivateAsync(args);
+        bool ok = DatabaseHelper.InitializeUserDatabase();
+        if (!ok)
+        {
+            Debug.WriteLine("Database initialization failed!");
+            // You might want to show an error message to the user here
+        }
+
+        var loginWindow = new LoginWindows();
+        loginWindow.Activate();
     }
 }

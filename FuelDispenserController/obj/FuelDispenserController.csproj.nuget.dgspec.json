@@ -165,7 +165,7 @@
             },
             "Microsoft.WindowsAppSDK": {
               "target": "Package",
-              "version": "[1.4.231008000, )"
+              "version": "[1.7.250606001, )"
             },
             "Microsoft.Xaml.Behaviors.WinUI.Managed": {
               "target": "Package",
