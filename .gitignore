@@ -32,6 +32,7 @@ bld/
 # Allow bin and its publish folder
 !bin/
 !bin/publish/
+!Output/
 !bin/publish/**
 [Oo]bj/
 [Ll]og/
